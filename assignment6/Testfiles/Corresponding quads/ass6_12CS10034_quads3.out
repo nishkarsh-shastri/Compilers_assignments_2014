@@ -1,0 +1,197 @@
+0)  FUNCTION main:
+1) _tmp000= A string address
+2) param _tmp000
+3) _tmp002 = call prints, 1
+4) _tmp003 = &err
+5) param _tmp003
+6) _tmp005 = call readi, 1
+7) a = _tmp005
+8) _tmp006= A string address
+9) param _tmp006
+10) _tmp008 = call prints, 1
+11) _tmp009 = &err
+12) param _tmp009
+13) _tmp011 = call readi, 1
+14) b = _tmp011
+15) _tmp012= A string address
+16) param _tmp012
+17) _tmp014 = call prints, 1
+18) _tmp015 = &err
+19) param _tmp015
+20) _tmp017 = call readi, 1
+21) c = _tmp017
+22) _tmp018 = 'a'
+23) p = _tmp018
+24) _tmp019 = 'b'
+25) q = _tmp019
+26) _tmp020 = 'd'
+27) r = _tmp020
+28) _tmp021 = &p
+29) m = _tmp021
+30) _tmp022 = &q
+31) n = _tmp022
+32) _tmp023 = &r
+33) o = _tmp023
+34) _tmp024 = &a
+35) x = _tmp024
+36) _tmp025 = &b
+37) y = _tmp025
+38) _tmp026 = &c
+39) z = _tmp026
+40) _tmp027 = *y
+41) *x = _tmp027
+42) _tmp028= A string address
+43) param _tmp028
+44) _tmp030 = call prints, 1
+45) param a
+46) call printi, 1
+47) _tmp032= A string address
+48) param _tmp032
+49) _tmp034 = call prints, 1
+50) _tmp035 = *z
+51) *y = _tmp035
+52) _tmp036= A string address
+53) param _tmp036
+54) _tmp038 = call prints, 1
+55) param b
+56) call printi, 1
+57) _tmp040= A string address
+58) param _tmp040
+59) _tmp042 = call prints, 1
+60) _tmp043 = 0
+61) i = _tmp043
+62) if a<b goto 64
+63) goto 66
+64) _tmp044 = 1
+65) goto 69
+66) _tmp044 = 0
+67) goto 89
+68) goto 109
+69) _tmp045 = i
+70) i = i + 1
+71) _tmp046 = a
+72) a = a + 1
+73) if a<b goto 75
+74) goto 77
+75) _tmp047 = 1
+76) goto 69
+77) _tmp047 = 0
+78) goto 80
+79) goto 80
+80) _tmp048= A string address
+81) param _tmp048
+82) _tmp050 = call prints, 1
+83) param i
+84) call printi, 1
+85) _tmp052= A string address
+86) param _tmp052
+87) _tmp054 = call prints, 1
+88) goto 109
+89) _tmp055 = i
+90) i = i + 1
+91) _tmp056 = b
+92) b = b + 1
+93) if a>b goto 95
+94) goto 97
+95) _tmp057 = 1
+96) goto 89
+97) _tmp057 = 0
+98) goto 100
+99) goto 100
+100) _tmp058= A string address
+101) param _tmp058
+102) _tmp060 = call prints, 1
+103) param i
+104) call printi, 1
+105) _tmp062= A string address
+106) param _tmp062
+107) _tmp064 = call prints, 1
+108) goto 109
+109) _tmp065= A string address
+110) param _tmp065
+111) _tmp067 = call prints, 1
+112) _tmp068= A string address
+113) param _tmp068
+114) _tmp070 = call prints, 1
+115) _tmp071 = *n
+116) _tmp072 = *o
+117) if _tmp071<_tmp072 goto 119
+118) goto 121
+119) _tmp073 = 1
+120) goto 124
+121) _tmp073 = 0
+122) goto 128
+123) goto 146
+124) _tmp074= A string address
+125) param _tmp074
+126) _tmp076 = call prints, 1
+127) goto 146
+128) _tmp077 = *n
+129) _tmp078 = *m
+130) if _tmp077>_tmp078 goto 132
+131) goto 134
+132) _tmp079 = 1
+133) goto 137
+134) _tmp079 = 0
+135) goto 141
+136) goto 145
+137) _tmp080= A string address
+138) param _tmp080
+139) _tmp082 = call prints, 1
+140) goto 146
+141) _tmp083= A string address
+142) param _tmp083
+143) _tmp085 = call prints, 1
+144) goto 146
+145) goto 146
+146) _tmp086= A string address
+147) param _tmp086
+148) _tmp088 = call prints, 1
+149) _tmp089 = 5
+150) _tmp090 = 0
+151) _tmp091 = _tmp090 * 1
+152) _tmp092 = 'y'
+153) car[_tmp091] = _tmp092
+154) _tmp093 = 1
+155) _tmp094 = _tmp093 * 1
+156) _tmp095 = 'o'
+157) car[_tmp094] = _tmp095
+158) _tmp096 = 2
+159) _tmp097 = _tmp096 * 1
+160) _tmp098 = 'u'
+161) car[_tmp097] = _tmp098
+162) _tmp099 = 3
+163) _tmp100 = _tmp099 * 1
+164) _tmp101 = 'r'
+165) car[_tmp100] = _tmp101
+166) _tmp102 = 4
+167) _tmp103 = _tmp102 * 1
+168) _tmp104 = '\n'
+169) car[_tmp103] = _tmp104
+170) _tmp105 = 0
+171) i = _tmp105
+172) _tmp106 = 5
+173) if i<_tmp106 goto 175
+174) goto 177
+175) _tmp107 = 1
+176) goto 183
+177) _tmp107 = 0
+178) goto 192
+179) goto 192
+180) _tmp108 = i
+181) i = i + 1
+182) goto 172
+183) _tmp109 = i * 1
+184) _tmp110 = car[_tmp109]
+185) _tmp111 = &_tmp110
+186) param _tmp111
+187) _tmp113 = call prints, 1
+188) _tmp114= A string address
+189) param _tmp114
+190) _tmp116 = call prints, 1
+191) goto 180
+192) _tmp117 = 0
+193) return _tmp117
+194) END of PROGRAM
+
+

@@ -1,0 +1,41 @@
+We cannot pass array into function argument
+Only four kind of types handled. int,int*,char and char*
+The global variables are simply the functions declared outside.
+It is assumed in continuity with previous assignments that global variables are to be ignored
+There are many changes made in .y and .cxx file of previous assignments to incorporate the many challenges faced in this assignment
+Thse changes include making some changes in function declaration and calling, array offset calculation, and return value handling.
+It is assumed that user would compulsarily add appropriate return value at the end of function specification.
+All the test files are given in test files folder and also in current folder.
+New Functions introduced
+
+void symbolTable::createMemoryBinding()
+void Quad::printAssembly(int index)
+
+typedef struct label
+{
+	int quadindex;
+	string name;
+}label;
+
+label findLabel(int index);
+label addLabel(int index);
+bool  isLabel(int index);
+
+
+void createLabelTable(vector<Quad*> v);
+void printLabelTable();
+void createStringLabel();
+
+bool checkStringIsInt(string s);
+int convertToInt(string s);
+
+//Create the external function libraries.
+void createExternalTable();
+
+Some new global Variables were also declared. You can see them in global Variables.c file
+
+All of them are explained in .cxx file
+
+
+As all the new functions are extension of existing Classes, hence I have defined them in translator file only instead of making a separate file. You can find all of them in 12CS10034_ass6_translator.cxx
+

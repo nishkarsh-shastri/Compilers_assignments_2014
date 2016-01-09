@@ -1,0 +1,7 @@
+	rm libprintFloat.a mainPrintFloat.o printFloat.o
+	cc -Wall -m32 -c printFloat.c
+	ar -rcs libprintFloat.a printFloat.o
+	cc -Wall -m32 -c mainPrintFloat.c
+	cc -m32 mainPrintFloat.o -L. -lprintFloat
+
+

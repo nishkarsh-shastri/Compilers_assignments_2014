@@ -1,0 +1,51 @@
+0)  FUNCTION main:
+1) _tmp000= A string address
+2) param _tmp000
+3) _tmp002 = call prints, 1
+4) _tmp003 = &err
+5) param _tmp003
+6) _tmp005 = call readi, 1
+7) a = _tmp005
+8) _tmp006= A string address
+9) param _tmp006
+10) _tmp008 = call prints, 1
+11) _tmp009 = &err
+12) param _tmp009
+13) _tmp011 = call readi, 1
+14) b = _tmp011
+15) _tmp012 = &a
+16) _tmp013 = &b
+17) param _tmp012
+18) param _tmp013
+19) call swap, 2
+20) _tmp015= A string address
+21) param _tmp015
+22) _tmp017 = call prints, 1
+23) _tmp018= A string address
+24) param _tmp018
+25) _tmp020 = call prints, 1
+26) param a
+27) call printi, 1
+28) _tmp022= A string address
+29) param _tmp022
+30) _tmp024 = call prints, 1
+31) _tmp025= A string address
+32) param _tmp025
+33) _tmp027 = call prints, 1
+34) param b
+35) call printi, 1
+36) _tmp029= A string address
+37) param _tmp029
+38) _tmp031 = call prints, 1
+39) _tmp032 = 0
+40) return _tmp032
+41)  FUNCTION swap:
+42) _tmp000 = *a
+43) temp = _tmp000
+44) _tmp001 = *b
+45) *a = _tmp001
+46) *b = temp
+47) return
+48) END of PROGRAM
+
+

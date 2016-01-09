@@ -1,0 +1,107 @@
+0)  FUNCTION factorial:
+1) _tmp000 = 1
+2) if n==_tmp000 goto 4
+3) goto 6
+4) _tmp001 = 1
+5) goto 16
+6) _tmp001 = 0
+7) goto 8
+8) _tmp002 = 0
+9) if n==_tmp002 goto 11
+10) goto 13
+11) _tmp003 = 1
+12) goto 16
+13) _tmp003 = 0
+14) goto 19
+15) goto 26
+16) _tmp005 = 1
+17) t = _tmp005
+18) goto 26
+19) _tmp006 = 1
+20) _tmp007 = n - _tmp006
+21) param _tmp007
+22) _tmp009 = call factorial, 1
+23) _tmp010 = n * _tmp009
+24) t = _tmp010
+25) goto 26
+26) return t
+27)  FUNCTION fibonacci:
+28) _tmp000 = 1
+29) if n==_tmp000 goto 31
+30) goto 33
+31) _tmp001 = 1
+32) goto 36
+33) _tmp001 = 0
+34) goto 39
+35) goto 64
+36) _tmp002 = 1
+37) t = _tmp002
+38) goto 64
+39) _tmp003 = 0
+40) if n==_tmp003 goto 42
+41) goto 44
+42) _tmp004 = 1
+43) goto 47
+44) _tmp004 = 0
+45) goto 50
+46) goto 63
+47) _tmp005 = 0
+48) t = _tmp005
+49) goto 64
+50) _tmp006 = 1
+51) _tmp007 = n - _tmp006
+52) param _tmp007
+53) _tmp009 = call fibonacci, 1
+54) p = _tmp009
+55) _tmp010 = 2
+56) _tmp011 = n - _tmp010
+57) param _tmp011
+58) _tmp013 = call fibonacci, 1
+59) q = _tmp013
+60) _tmp014 = p + q
+61) t = _tmp014
+62) goto 64
+63) goto 64
+64) return t
+65)  FUNCTION main:
+66) _tmp000= A string address
+67) param _tmp000
+68) _tmp002 = call prints, 1
+69) _tmp003 = &err
+70) param _tmp003
+71) _tmp005 = call readi, 1
+72) n = _tmp005
+73) param n
+74) _tmp007 = call factorial, 1
+75) fact = _tmp007
+76) _tmp008= A string address
+77) param _tmp008
+78) _tmp010 = call prints, 1
+79) param fact
+80) call printi, 1
+81) _tmp012= A string address
+82) param _tmp012
+83) _tmp014 = call prints, 1
+84) _tmp015= A string address
+85) param _tmp015
+86) _tmp017 = call prints, 1
+87) _tmp018 = &err
+88) param _tmp018
+89) _tmp020 = call readi, 1
+90) n = _tmp020
+91) _tmp021= A string address
+92) param _tmp021
+93) _tmp023 = call prints, 1
+94) param n
+95) _tmp025 = call fibonacci, 1
+96) fib = _tmp025
+97) param fib
+98) call printi, 1
+99) _tmp027= A string address
+100) param _tmp027
+101) _tmp029 = call prints, 1
+102) _tmp030 = 0
+103) return _tmp030
+104) END of PROGRAM
+
+

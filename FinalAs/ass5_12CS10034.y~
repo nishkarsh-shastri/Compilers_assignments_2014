@@ -1,0 +1,831 @@
+
+%{
+    #include <stdio.h>
+   	void yyerror(const char*);
+    extern int yylex(void);
+ %}
+
+%union{
+	int intval;
+	char* cval;
+	float fval;
+	char* sval;
+	Symbol *loc;
+	list<int>* nextlist;
+	expression expr;
+	list<Symbol*>* arg_list;
+	opCode op;
+	type_enum typeCode;
+	Type*	 typeptr;
+}
+
+%token AUTO BREAK CASE CHAR CONST CONTINUE DEFAULT DO DOUBLE ELSE ENUM EXTERN
+%token FLOAT FOR GOTO IF INLINE INT LONG REGISTER RESTRICT RETURN SHORT SIGNED SIZEOF STATIC STRUCT SWITCH
+%token TYPEDEF UNION UNSIGNED VOID VOLATILE WHILE BOOL COMPLEX IMAGINARY
+%token <loc> IDENTIFIER          //It will be a Symbol class pointer and would containg the pointer to corresponding symbol table entry
+%token <intval>INTEGER_CONSTANT //It will contain the value of INTEGER_CONSTANT
+%token <fval>FLOATING_CONSTANT  //It will contain the value of FLOATING_CONSTANT
+%token ENUMERATION_CONSTANT 	
+%token <cval>CHARACTER_CONSTANT //It will contain the value of CHARACTER_CONSTANT
+%token <sval>STRING_LITERAL		//The string literal will be stored using the char* field
+%token POINTER INCREMENT DECREMENT LEFT_SHIFT_OP RIGHT_SHIFT_OP LESS_THAN_EQUAL_TO GREATER_THAN_EQUAL_TO
+%token EQUALS_TO NOT_EQUALS_TO AND_OP OR_OP ELLIPSIS ASSIGN_OP MULT_ASSIGN DIV_ASSIGN MOD_ASSIGN SUM_ASSIGN
+%token SUBTRACT_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN XOR_ASSIGN OR_ASSIGN SINGLE_LINE_COMMENT MULT_LINE_COMMENT
+
+
+%left '+' '-'
+%left '*' '/'
+%nonassoc unary_minus
+
+//------------------ Statements ----------------------------
+
+%type<nextlist> statement
+%type<nextlist> labeled_statement
+%type<nextlist> compound_statement
+%type<nextlist> expression_statement
+%type<nextlist> expression_opt
+%type<nextlist> selection_statement
+%type<nextlist> iteration_statement
+%type<nextlist> jump_statement
+%type<nextlist> block_item
+%type<nextlist> block_item_list
+%type<nextlist> block_item_list_opt
+
+// ---------------------------------------------------------
+
+%type<intval>		M;
+%type<nextlist>		N;
+%type<op>			unary_operator;
+//------------------Expressions------------------------------
+
+%type<expr> 		expression
+%type<expr>    		assignment_expression
+%type<expr> 		constant_expression
+%type<expr> 		conditional_expression
+%type<expr> 		unary_expression
+%type<expr> 		logical_OR_expression
+%type<expr> 		logical_AND_expression
+%type<expr> 		inclusive_OR_expression
+%type<expr>  		exclusive_OR_expression
+%type<expr> 		AND_expression
+%type<expr> 		equality_expression
+%type<expr> 		relational_expression
+%type<expr> 		shift_expression
+%type<expr> 		additive_expression
+%type<expr> 		multiplicative_expression
+%type<expr> 		cast_expression
+%type<expr> 		unary_expression
+%type<expr> 		postfix_expression
+%type<expr> 		primary_expression
+%type<expr> 		constant
+%type<arg_list>		argument_expression_list
+%type<arg_list>		argument_expression_list_opt
+%type<typeCode>		type_name;
+
+
+
+//-------------------------declarations----------------------------------
+%type<> 			declaration
+%type<> 			declaration_specifiers
+%type<> 			declaration_specifiers_opt
+%type<> 			init_declarator
+%type<> 			init_declarator_list
+%type<> 			storage_class_specifier
+%type<typeptr> 			type_specifier
+%type<> 			specifier_qualifier_list
+%type<> 			identifier_opt
+%type<> 			function_specifier
+%type<> 			declarator
+%type<> 			pointer_opt
+%type<> 			direct_declarator
+%type<> 			type_qualifier_list_opt
+%type<> 			type_qualifier_list
+%type<> 			identifier_list
+%type<> 			identifier_list_opt
+%type<> 			pointer
+%type<> 			parameter_type_list
+%type<> 			parameter_list
+%type<> 			parameter_declaration
+%type<> 			identifier_list
+%type<> 			type_name
+%type<> 			initializer
+%type<> 			initializer_list
+%type<> 			designation_opt
+%type<> 			designation
+%type<> 			designator_list
+%type<> 			designator
+
+//-----------------------------------------------------------------------
+
+%start translation_unit
+
+%%
+
+//	External Definitions
+translation_unit:		external_declaration									|
+						translation_unit external_declaration
+						;
+
+external_declaration:	function_definition										|
+						declaration
+						;
+
+function_definition:	declaration_specifiers declarator declaration_list_opt compound_statement
+						;
+
+declaration_list_opt:	declaration_list 										|
+						/*epsilon*/
+						;
+
+declaration_list:		declaration 											|
+						declaration_list declaration
+						;
+
+//*****************************************************************************************************
+
+
+//  Statements
+statement:				labeled_statement										|
+						compound_statement										|
+						expression_statement									|
+						selection_statement										|
+						iteration_statement										|
+						jump_statement		
+						;
+
+labeled_statement:		IDENTIFIER ':' statement 								|
+						CASE constant_expression ':' statement 					|
+						DEFAULT ':' statement 
+						;
+
+compound_statement:		'{' block_item_list_opt '}'{$$ = $2;}
+						;
+
+block_item_list_opt:	block_item_list {$$=0;}										|	
+						/*epsilon*/
+						;
+
+block_item_list:		block_item 												|
+						block_item_list M block_item
+						{
+							backpatch($1,$2);
+							$$ = $3;
+						};
+
+block_item:				declaration ($$=0;)										|
+						expression_statement
+						;						
+
+expression_statement:	expression_opt ';' {$$=0;}
+						;
+
+expression_opt:			expression 	
+						{
+							$$.loc=0;
+							$$.truelist=0;
+							$$.falselist=0;
+						}											
+						|
+						/*epsilon*/
+						;
+
+selection_statement:	IF '(' expression ')' N M statement N ELSE M statement N	
+						{
+							backpatch($5,quadPointer);
+							conv2bool($3);
+							backpatch($3->truelist,$6);
+							backpatch($3->falselist,$10);
+							list<int>* temp1 = merge($7,$8);
+							list<int>* temp2 = merge($8,$12);
+							$$ = merge(temp1,temp2);
+						}		
+						|
+						IF '(' expression ')' N M statement N
+						{
+							backpatch($5,quadPointer);
+							conv2bool($3);
+							backpatch($3->truelist,$6);
+							list<int>* temp = merge($7,$8);
+							$$ = merge($3->falselist,temp);
+
+						} 						
+						|
+						SWITCH '(' expression ')' statement
+						;
+
+iteration_statement:	WHILE M '(' expression ')' N M statement 
+						{
+							emit(_goto,$1);
+							backpatch($6,quadPointer);
+							conv2bool($4);
+							backpatch($4.truelist,$7);
+							backpatch($8,$2);
+							$$ = $4.falselist;
+							
+						}												
+						|
+						DO M statement  WHILE '(' expression ')' N ';' 										
+						{
+							backpatch($9,quadPointer);
+							conv2bool($7);
+							backpatch($7.truelist,$2);
+							backpatch($3,$5);
+							$$ = $7.falselist;
+						}
+						|
+						FOR '(' expression_opt ';' M expression_opt N ';' M expression_opt N ')' M statement 		
+						{
+							emit(_goto,$9);
+							backpatch($7,quadPointer);
+							conv2bool($6);
+							backpatch($6.truelist,$13);
+							backpatch($11,$5);
+							backpatch($14,$9);							
+							$$ = $6->falselist;
+						}
+						|
+						FOR '(' declaration expression_opt ';' expression_opt ')' statement
+						;
+
+jump_statement:			GOTO IDENTIFIER ';' 									|
+						CONTINUE ';' 											|
+						BREAK ';' 												|
+						RETURN expression_opt ';' 
+						{
+							emit(RET,$2->name);
+						}
+						;
+
+//----------------------------------------------------------------------------------------------
+
+// Declarations 
+
+declaration:			declaration_specifiers init_declarator_list_opt ';'
+						;
+
+init_declarator_list_opt: init_declarator_list 									|
+						/*epsilon*/
+						;
+
+declaration_specifiers:	storage_class_specifier declaration_specifiers_opt 		|
+						type_specifier declaration_specifiers_opt				|
+						type_qualifier declaration_specifiers_opt 				|
+						function_specifier declaration_specifiers_opt
+						;
+
+declaration_specifiers_opt: declaration_specifiers 								|
+						/*epsilon*/
+						;
+
+init_declarator_list:	init_declarator 										|
+						init_declarator_list ',' init_declarator
+						;
+
+init_declarator:		declarator 												|
+						declarator ASSIGN_OP initializer
+						;
+
+storage_class_specifier: 	EXTERN 												|
+							STATIC  											|
+							AUTO 												|
+							REGISTER
+						;
+
+type_specifier:			VOID {$$=new Type(VOID); globalType = $$;}								|
+						CHAR {$$=new Type(CHAR);globalType = $$;}													|
+						SHORT 													|
+						INT	{$$=new Type(INT);globalType = $$;}													|
+						LONG 													|
+						FLOAT 													|
+						DOUBLE {$$=new Type(DOUBLE);globalType = $$;}													|
+						SIGNED													|
+						UNSIGNED 												|
+						BOOL 													|
+						COMPLEX 												|
+						IMAGINARY 												|
+						enum_specifier
+						;			
+
+specifier_qualifier_list: type_specifier specifier_qualifier_list_opt 			|
+						type_qualifier specifier_qualifier_list_opt
+						;	
+
+specifier_qualifier_list_opt: specifier_qualifier_list 							|
+						/*epsilon*/
+						;
+
+enum_specifier:			ENUM identifier_opt '{' enumerator_list '}' 			|
+						ENUM identifier_opt '{' enumerator_list ',' '}' 		|																			
+						ENUM IDENTIFIER
+						;
+
+identifier_opt:			IDENTIFIER 												|
+						/*epsilon*/
+						;
+
+enumerator_list:		enumerator 												|
+						enumerator_list ',' enumerator
+						;
+
+enumerator:				enumeration_constant 									|
+						enumeration_constant ASSIGN_OP constant_expression
+						;
+
+type_qualifier:			CONST 													|
+						RESTRICT 												|
+						VOLATILE
+						;
+
+function_specifier:		INLINE
+						;
+
+declarator :			pointer_opt direct_declarator
+						;
+
+pointer_opt:			pointer 												|
+						/*epsilon*/
+						;
+
+direct_declarator:		IDENTIFIER	
+						{
+							$1->update(globalType);
+						}			
+						|
+						'(' declarator ')' 																	|
+						direct_declarator '[' type_qualifier_list_opt assignment_expression_opt ']' 		|																										
+						direct_declarator '[' STATIC type_qualifier_list_opt assignment_expression ']' 		|
+						direct_declarator '[' type_qualifier_list STATIC assignment_expression ']' 			|
+						direct_declarator '[' type_qualifier_list_opt '*' ']' 								|
+						direct_declarator '(' parameter_type_list ')' 										|
+						direct_declarator '(' identifier_list_opt ')'
+						;
+
+type_qualifier_list_opt:type_qualifier_list 									|
+						/*epsilon*/
+						;
+
+assignment_expression_opt:assignment_expression 								|
+						/*epsilon*/
+						;
+
+identifier_list_opt:	identifier_list 										|
+						/*epsilon*/
+						;
+
+pointer:				'*' type_qualifier_list_opt 							|
+						'*' type_qualifier_list_opt pointer
+						;
+
+type_qualifier_list:	type_qualifier 											|
+						type_qualifier_list type_qualifier
+						;
+
+parameter_type_list:	parameter_list 											|
+						parameter_list ',' ELLIPSIS
+						;
+
+parameter_list:			parameter_declaration 									|
+						parameter_list ',' parameter_declaration
+						;
+
+parameter_declaration:	declaration_specifiers declarator 						|
+						declaration_specifiers
+						;
+
+identifier_list :		IDENTIFIER 												|
+						identifier_list ',' IDENTIFIER
+						;
+
+type_name:				specifier_qualifier_list
+						;
+
+initializer:			assignment_expression 									|
+						'{' initializer_list '}' 								|
+						'{' initializer_list ',' '}'
+						;
+
+initializer_list:		designation_opt initializer 							|
+						initializer_list ',' designation_opt initializer
+						;																																															
+
+designation_opt:		designation 											|
+						/*epsilon*/
+						;
+
+designation:			designator_list ASSIGN_OP
+						;
+
+designator_list:		designator 												|
+						designator_list designator
+						;
+
+designator:				'[' constant_expression ']' 							|
+						'.' IDENTIFIER
+						;
+
+//-------------------------------------------------------------------------------------------------
+// Expressions 
+
+expression :			assignment_expression	
+						|
+						expression ',' assignment_expression
+						;
+
+constant_expression:	conditional_expression
+						;
+
+assignment_expression:	conditional_expression 									|
+						unary_expression assignment_operator assignment_expression	
+						{
+							$$.loc = gentemp();
+							emit(COPY,$1.loc->name,$3.loc->name);
+							emit(COPY,$$.loc->name,$1.loc->name);
+						}
+						;																																			
+
+assignment_operator:	ASSIGN_OP 												|
+						MULT_ASSIGN 											|
+						DIV_ASSIGN 												|
+						MOD_ASSIGN 												|
+						SUM_ASSIGN 												|
+						SUBTRACT_ASSIGN 										|
+						LEFT_ASSIGN 											|
+						RIGHT_ASSIGN 											|
+						AND_ASSIGN 												|
+						XOR_ASSIGN 												|
+						OR_ASSIGN
+						;
+
+conditional_expression: logical_OR_expression 									|
+						logical_OR_expression N '?' M expression N ':' M conditional_expression	
+						{
+							$$.loc = gentemp();
+							$$.type = $5.type;
+							emit(COPY,$$.loc->name,$9.loc->name);
+							list<int> *l = makelist(quadPointer);
+							emit(_goto,"---");
+							backpatch($6,quadPointer);
+							emit(COPY,$$.loc->name,$5.loc->name);
+							l = merge(l,makelist(quadPointer));
+							emit(_goto,"---");
+							backpatch($2,quadPointer);
+							conv2bool($1); //Need to specify this function
+							backpatch($1.truelist,$4);
+							backpatch($1.falselist,$8);
+							backpatch(l,quadPointer);
+						}
+						;
+
+logical_OR_expression:	logical_AND_expression 									|
+						logical_OR_expression OR_OP M logical_AND_expression
+						{
+							backpatch($1.falselist,$3);
+							$$.truelist = merge($1.truelist,$4.truelist);
+							$$.falselist = $4.falselist;
+						}
+						;
+
+logical_AND_expression:	inclusive_OR_expression 								|
+						logical_AND_expression AND_OP M inclusive_OR_expression
+						{
+							backpatch($1.truelist,$3);
+							$$.truelist = merge($1.truelist,$4.truelist);
+							$$.falselist = $4.falselist;
+						}
+						;
+
+inclusive_OR_expression:exclusive_OR_expression 								|
+						inclusive_OR_expression '|' exclusive_OR_expression
+						{
+							$$.loc=symTab->gentemp();
+							typecheck($1,$3);
+							$$.type = $1.type;
+							emit(BIT_OR,($$.loc)->name,($1.loc)->name,($3.loc)->name);
+						}
+						;
+
+exclusive_OR_expression:AND_expression 											|
+						exclusive_OR_expression '^' M AND_expression
+						{
+							backpatch($1.truelist,quadPointer);
+							emit(COPY,$1.loc->name,"1");
+							emit(_goto,to_string(M));
+							backpatch($1.falselist,quadPointer);
+							emit(COPY,$1.loc->name,"0");
+							emit(_goto,to_string(M));
+
+							$$.truelist = makelist(quadPointer);
+							backpatch($3.falselist,quadPointer);
+							emit(_if,B1.loc->name,"goto","---");
+							$$.falselist = makelist(quadPointer);
+							emit(_goto,"---");
+
+							temp = makelist(quadPointer);
+							$$.falselist = merge($$.falselist,temp);
+							backpatch(B2.truelist,quadPointer);
+							emit(_if,B1.loc,"goto","----");
+							temp = makelist(quadPointer);
+							$$.truelist = merge($$.truelist,quadPointer);
+							emit(_goto,"---");
+						}
+						;
+
+AND_expression :		equality_expression 									|
+						AND_expression '&' equality_expression
+						{
+							$$.loc=symTab->gentemp();
+							typecheck($1,$3);
+							$$.type = $1.type;
+							emit(BIT_AND,($$.loc)->name,($1.loc)->name,($3.loc)->name);
+						}
+						;
+
+equality_expression:	relational_expression 									|
+						equality_expression EQUALS_TO relational_expression 			|
+						{
+							$$ = relationEvaluate(EQUAL_TO,$1,$3);
+						}
+						equality_expression NOT_EQUALS_TO relational_expression
+						{
+							$$ = relationEvaluate(NOT_EQUAL_TO,$1,$3);
+						}
+						;
+
+relational_expression:	shift_expression 										|
+						relational_expression '<' shift_expression
+						{
+							$$ = relationEvaluate(LESS_THAN,$1,$3);
+						}
+						|
+						relational_expression '>' shift_expression 				
+						{
+							$$ = relationEvaluate(GREATER_THAN,$1,$3);
+						}
+						|
+						relational_expression LESS_THAN_EQUAL_TO shift_expression 				
+						{
+							$$ = relationEvaluate(LESS_THAN_EQUAL,$1,$3);
+						}
+						|
+						relational_expression GREATER_THAN_EQUAL_TO shift_expression
+						{
+							$$ = relationEvaluate(GREATER_THAN_EQUAL,$1,$3);
+						}
+						;
+
+shift_expression:		additive_expression 									|
+						shift_expression LEFT_SHIFT_OP additive_expression 
+						{
+
+							if($3.type->type==INT)
+							{
+								$$.loc=symTab->gentemp();
+								//typecheck($1,$3);
+								//Check whether the type of $3 is int or not
+								$$.type = $1.type;
+								emit(LEFT_SHIFT,($$.loc)->name,($1.loc)->name,($3.loc)->name);
+							}
+							else
+							{
+								cerr<<"Incompatible type"<<endl;
+							}
+						}
+						|
+						shift_expression RIGHT_SHIFT_OP additive_expression
+						{
+							if($3.type->type==INT)
+							{
+								$$.loc=symTab->gentemp();
+								//typecheck($1,$3);
+								$$.type = $1.type;
+								emit(RIGHT_SHIFT,($$.loc)->name,($1.loc)->name,($3.loc)->name);
+							}
+							else{
+								cerr<<"Incompatible type"<<endl;
+							}
+						}
+						;
+
+additive_expression :	multiplicative_expression 								|
+						additive_expression '+' multiplicative_expression 
+						{
+
+							$$.loc=symTab->gentemp();
+							typecheck($1,$3);
+							$$.type = $1.type;
+							emit(PLUS,($$.loc)->name,($1.loc)->name,($3.loc)->name);
+						}
+						|
+						additive_expression '-' multiplicative_expression
+						{
+							$$.loc=symTab->gentemp();
+							typecheck($1,$3);
+							$$.type = $1.type;
+							emit(MINUS,($$.loc)->name,($1.loc)->name,($3.loc)->name);
+						}
+						;
+
+multiplicative_expression:	cast_expression 									|
+						multiplicative_expression '*' cast_expression 			
+						{
+
+							$$.loc=symTab->gentemp();
+							typecheck($1,$3);
+							$$.type = $1.type;
+							emit(MULT,($$.loc)->name,($1.loc)->name,($3.loc)->name);							
+						}
+						|
+						multiplicative_expression '/' cast_expression
+						{
+							$$.loc=symTab->gentemp();
+							typecheck($1,$3);
+							$$.type = $1.type;
+							emit(DIVIDE,($$.loc)->name,($1.loc)->name,($3.loc)->name);	
+						}
+						|
+						multiplicative_expression '%' cast_expression
+						{
+							$$.loc=symTab->gentemp();
+							typecheck($1,$3);
+							$$.type = $1.type;
+							emit(MODULUS,($$.loc)->name,($1.loc)->name,($3.loc)->name);
+						}
+						;
+
+cast_expression : 		unary_expression 										|
+						'(' type_name ')' cast_expression
+						{
+							if($2 != $4.type->type)
+							{
+								$$ = conv($4,$2);
+							}
+							else 
+							$$ = $4;
+						}
+
+						;
+
+
+/*ITS BETTER TO MAKE THE UNARY_OPERATOR AS OPCODE_ENUM */
+
+unary_operator	:		'&' {$$=UADDRESS;}													|
+						'*'	{$$=UPOINTER;}									 				|
+						'+' {$$=UPLUS;}													|
+						'-' {$$=UMINUS;}													|
+						'~' {$$=UBITNEGATION;}													|
+						'!' {$$=UNEGATION;}
+						;
+
+unary_expression:		postfix_expression 										|
+						INCREMENT unary_expression
+						{
+							//Write the rules for preincrement
+							emit(PLUS,$2.loc->name,$2.loc->name,to_string(1));	
+							$$ = $2;
+						}
+						|
+						DECREMENT unary_expression
+						{
+							//Write the rules for predecrement
+							emit(MINUS,$2.loc->name,$2.loc->name,to_string(1));	
+							$$ = $2;
+						}
+						|
+						unary_operator cast_expression 
+						{
+							$$.loc=symTab->gentemp();
+							$$.type = $2.type;
+							symTab->update($$.loc,$2.type)
+					 		emit($1,($$.loc)->name,($2.loc)->name);
+						}
+						|
+						SIZEOF unary_expression 								|
+						SIZEOF '(' type_name ')'
+						;
+
+argument_expression_list_opt:
+						argument_expression_list 								|
+						/*epsilon*/{$$=0;}
+						;
+
+argument_expression_list:
+						assignment_expression 									|
+						argument_expression_list ',' assignment_expression
+						{
+							list<Symbol*>* L = new list<Symbol*>;
+							L.push_back($3.loc);
+							$$ = merge($1,temp);
+						}
+						;
+
+postfix_expression :	primary_expression 										|
+						postfix_expression '[' expression ']' 	{}				
+						{
+
+
+						}
+						|//array declaration will be done later
+						postfix_expression '(' argument_expression_list_opt ')' 
+						{
+
+						}
+						|
+						postfix_expression '.' IDENTIFIER 	
+						{
+							$$.loc = symTab->gentemp();
+							$$.type = $3.type;
+							symTab->update($$.loc,$3->type);
+							emit(DOT,$$.loc->name,$1.loc->name,$2.loc->name);
+						}
+						|
+						postfix_expression POINTER IDENTIFIER 		
+						{
+							//dereferencing	
+							$$.loc = symTab->gentemp();
+							$$.type = $3.type;
+							symTab->update($$.loc,$3->type);
+							emit(UPOINTER,$$.loc->name,$1.loc->name,$3.loc->name);//DOUBT HERE
+						}
+						|
+						postfix_expression INCREMENT 							
+						{
+							//post increment
+							$$.loc = symTab->gentemp();
+							$$.type = $2.type();
+							symTab->update($$.loc,$2->type);
+							emit(copy,$$.loc->name,$2.loc->name);
+							emit(PLUS,$2.loc->name,$2.loc->name,to_string(1));							
+						}
+						|
+						postfix_expression DECREMENT 							
+						{
+							$$.loc = symTab->gentemp();
+							$$.type = $2.type();
+							symTab->update($$.loc,$2->type);
+							emit(copy,$$.loc->name,$2.loc->name);
+							emit(MINUS,$2.loc->name,$2.loc->name,to_string(1));	
+							//post decrement
+						}
+						|
+						'(' type_name ')' '{' initializer_list '}' 				|
+						'(' type_name ')' '{' initializer_list ',' '}'
+						;
+
+primary_expression:		IDENTIFIER 	
+						{
+							$$.loc = $1;
+						}
+						|
+						constant 
+						|
+						STRING_LITERAL
+						{
+							$$.loc = symTab->gentemp();
+							$$.type = new pointer(POINTER,CHAR);//SEE IT AGAIN
+							symTab->update($$.loc,$$.type);
+							emit(COPY,($$.loc)->name,to_string($1));//Check the to_string function
+						}
+						|
+						'(' expression ')'{$$=$2;}
+						;
+
+constant :				INTEGER_CONSTANT 
+						{
+							$$.loc=symTab->gentemp();
+							$$.type = new Type(INT);
+							symTab->update($$.loc,$$.type);//write the update function accordingly
+							emit(copy,$$.loc->name,to_string($1));
+						}
+						|
+						FLOATING_CONSTANT
+						{
+							$$.loc=symTab->gentemp();
+							$$.type = new Type(DOUBLE);
+							symTab->update($$.loc,$$.type);//write the update function accordingly
+							emit(copy,$$.loc->name,to_string($1));
+						}
+						|
+						CHARACTER_CONSTANT
+						{
+							$$.loc=symTab->gentemp();
+							$$.type = new Type(CHAR);
+							symTab->update($$.loc,$$.type);//write the update function accordingly
+							emit(copy,$$.loc->name,to_string($1));
+						}
+						;
+
+enumeration_constant:	IDENTIFIER
+						;						
+	
+//Augmentation variables
+
+M :						{$$=quadptr;};
+N :						{$$=makelist(quadptr);
+						emit(_goto);	
+						};									
+							
+%%
+
+void yyerror(const char* s){
+    printf("%s",s);
+}

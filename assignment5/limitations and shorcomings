@@ -1,0 +1,6 @@
+* The language being tiny C, has left out a lot of semantics to be undeclared. They will throw warnings when compiling the bison file. But the elimination of these rules will only lead to future ignorance in case they are needed.
+* Although pointer types are handled but the current semantics given is unable to solve for double,triple pointers and so on like ***t = 7;
+* One of the thing to be seen is multiple statements going to same goto written consecutively, this is because of using non terminal N which makes one extra dangling goto. This can be removed during optimization.
+* The limitation of types present in UNION leads to unnecessarily complicated structure. If it could support class or list STL of C++. 
+* More over most of the time errors are not printed as such. They can be handled by using the funciton yyerror(). But I have refrained to do so as it was assumed that test file would be bug free.
+* Five test files are associated with the given tar archive which can be used as test cases to see whether all the types of expressions are handled properly or not.

@@ -1,0 +1,119 @@
+0)  FUNCTION main:
+1) _tmp000 = 100
+2) _tmp001= A string address
+3) param _tmp001
+4) _tmp003 = call prints, 1
+5) _tmp004 = &err
+6) param _tmp004
+7) _tmp006 = call readi, 1
+8) n = _tmp006
+9) _tmp007= A string address
+10) param _tmp007
+11) _tmp009 = call prints, 1
+12) _tmp010 = 0
+13) i = _tmp010
+14) if i<n goto 16
+15) goto 18
+16) _tmp011 = 1
+17) goto 24
+18) _tmp011 = 0
+19) goto 30
+20) goto 30
+21) _tmp012 = i
+22) i = i + 1
+23) goto 14
+24) _tmp013 = i * 4
+25) _tmp014 = &err
+26) param _tmp014
+27) _tmp016 = call readi, 1
+28) a[_tmp013] = _tmp016
+29) goto 21
+30) _tmp017= A string address
+31) param _tmp017
+32) _tmp019 = call prints, 1
+33) i = n
+34) _tmp020 = 0
+35) if i>_tmp020 goto 37
+36) goto 39
+37) _tmp021 = 1
+38) goto 45
+39) _tmp021 = 0
+40) goto 88
+41) goto 88
+42) _tmp022 = i
+43) i = i - 1
+44) goto 34
+45) _tmp023 = 0
+46) j = _tmp023
+47) _tmp024 = 1
+48) _tmp025 = i - _tmp024
+49) if j<_tmp025 goto 51
+50) goto 53
+51) _tmp026 = 1
+52) goto 59
+53) _tmp026 = 0
+54) goto 42
+55) goto 87
+56) _tmp027 = j
+57) j = j + 1
+58) goto 47
+59) _tmp028 = 1
+60) _tmp029 = j + _tmp028
+61) _tmp030 = _tmp029 * 4
+62) _tmp031 = a[_tmp030]
+63) _tmp032 = j * 4
+64) _tmp033 = a[_tmp032]
+65) if _tmp031<_tmp033 goto 67
+66) goto 69
+67) _tmp034 = 1
+68) goto 72
+69) _tmp034 = 0
+70) goto 56
+71) goto 86
+72) _tmp035 = j * 4
+73) _tmp036 = a[_tmp035]
+74) temp = _tmp036
+75) _tmp037 = j * 4
+76) _tmp038 = 1
+77) _tmp039 = j + _tmp038
+78) _tmp040 = _tmp039 * 4
+79) _tmp041 = a[_tmp040]
+80) a[_tmp037] = _tmp041
+81) _tmp042 = 1
+82) _tmp043 = j + _tmp042
+83) _tmp044 = _tmp043 * 4
+84) a[_tmp044] = temp
+85) goto 56
+86) goto 56
+87) goto 42
+88) _tmp045= A string address
+89) param _tmp045
+90) _tmp047 = call prints, 1
+91) _tmp048 = 0
+92) i = _tmp048
+93) if i<n goto 95
+94) goto 97
+95) _tmp049 = 1
+96) goto 103
+97) _tmp049 = 0
+98) goto 111
+99) goto 111
+100) _tmp050 = i
+101) i = i + 1
+102) goto 93
+103) _tmp051 = i * 4
+104) _tmp052 = a[_tmp051]
+105) param _tmp052
+106) call printi, 1
+107) _tmp054= A string address
+108) param _tmp054
+109) _tmp056 = call prints, 1
+110) goto 100
+111) _tmp057= A string address
+112) param _tmp057
+113) _tmp059 = call prints, 1
+114) _tmp060 = 0
+115) return _tmp060
+116) END of PROGRAM
+
+

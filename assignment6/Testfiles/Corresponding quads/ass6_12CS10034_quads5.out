@@ -1,0 +1,109 @@
+0)  FUNCTION findmax:
+1) max = a
+2) if b>a goto 4
+3) goto 6
+4) _tmp000 = 1
+5) goto 9
+6) _tmp000 = 0
+7) goto 21
+8) goto 31
+9) if b>c goto 11
+10) goto 13
+11) _tmp001 = 1
+12) goto 16
+13) _tmp001 = 0
+14) goto 18
+15) goto 20
+16) max = b
+17) goto 31
+18) max = c
+19) goto 31
+20) goto 31
+21) if c>a goto 23
+22) goto 25
+23) _tmp002 = 1
+24) goto 28
+25) _tmp002 = 0
+26) goto 31
+27) goto 30
+28) max = c
+29) goto 31
+30) goto 31
+31) return max
+32)  FUNCTION main:
+33) _tmp000= A string address
+34) param _tmp000
+35) _tmp002 = call prints, 1
+36) _tmp003= A string address
+37) param _tmp003
+38) _tmp005 = call prints, 1
+39) _tmp006 = &err
+40) param _tmp006
+41) _tmp008 = call readi, 1
+42) a = _tmp008
+43) _tmp009= A string address
+44) param _tmp009
+45) _tmp011 = call prints, 1
+46) _tmp012 = &err
+47) param _tmp012
+48) _tmp014 = call readi, 1
+49) b = _tmp014
+50) _tmp015= A string address
+51) param _tmp015
+52) _tmp017 = call prints, 1
+53) _tmp018 = &err
+54) param _tmp018
+55) _tmp020 = call readi, 1
+56) c = _tmp020
+57) param a
+58) param b
+59) param c
+60) _tmp022 = call findmax, 3
+61) max = _tmp022
+62) _tmp023= A string address
+63) param _tmp023
+64) _tmp025 = call prints, 1
+65) param max
+66) call printi, 1
+67) _tmp027= A string address
+68) param _tmp027
+69) _tmp029 = call prints, 1
+70) _tmp030= A string address
+71) param _tmp030
+72) _tmp032 = call prints, 1
+73) _tmp033= A string address
+74) param _tmp033
+75) _tmp035 = call prints, 1
+76) _tmp036 = b * c
+77) _tmp037 = _tmp036 * a
+78) a = _tmp037
+79) param a
+80) call printi, 1
+81) _tmp039= A string address
+82) param _tmp039
+83) _tmp041 = call prints, 1
+84) _tmp042= A string address
+85) param _tmp042
+86) _tmp044 = call prints, 1
+87) _tmp045 = a / c
+88) b = _tmp045
+89) param b
+90) call printi, 1
+91) _tmp047= A string address
+92) param _tmp047
+93) _tmp049 = call prints, 1
+94) _tmp050= A string address
+95) param _tmp050
+96) _tmp052 = call prints, 1
+97) _tmp053 = a % b
+98) c = _tmp053
+99) param c
+100) call printi, 1
+101) _tmp055= A string address
+102) param _tmp055
+103) _tmp057 = call prints, 1
+104) _tmp058 = 0
+105) return _tmp058
+106) END of PROGRAM
+
+
